@@ -1,845 +1,531 @@
 # Neovim 配置文档
 
-基于 [lazy.nvim](https://github.com/folke/lazy.nvim) 的现代化 Neovim 配置，集成了多种效率工具，提供出色的编辑体验。
+基于 lazy.nvim 的现代化 Neovim 配置，支持 Python/Java/前端开发。
 
 ---
 
-## 📋 目录
+## 🚀 快速上手
 
-- [快速开始](#快速开始)
-- [插件列表](#插件列表)
-  - [外观主题](#外观主题)
-  - [文件管理](#文件管理)
-  - [编辑增强](#编辑增强)
-  - [自动补全](#自动补全)
-  - [LSP 支持](#lsp-支持)
-  - [Python 开发](#python-开发-1)
-  - [Java 开发](#java-开发-1)
-  - [Git 集成](#git-集成)
-  - [工具辅助](#工具辅助)
-- [快捷键](#快捷键)
-  - [基础快捷键](#基础快捷键)
-  - [文件管理](#文件管理-1)
-  - [缓冲区操作](#缓冲区操作)
-  - [搜索查找](#搜索查找)
-  - [LSP 相关](#lsp-相关)
-  - [Python 开发](#python-开发)
-  - [Java 开发](#java-开发)
-  - [Git 操作](#git-操作)
-- [插件使用说明](#插件使用说明)
-
----
-
-## ⌨️ 常用快捷键速查
-
-> **Leader 键**: `<Space>` (空格键)
-
-### 最常用
-
-| 快捷键 | 功能 |
-|--------|------|
-| `<Space>e` | 切换文件树 |
-| `<Space>ff` | 查找文件 |
-| `<Space>fg` | 全局搜索文本 |
-| `<Space>w` | 保存文件 |
-| `<Space>q` | 退出 |
-| `<Space>bn/bp` | 下/上一个缓冲区 |
-| `<Space>bd` | 关闭缓冲区 |
-| `gd` | 跳转到定义 |
-| `gr` | 查找引用 |
-| `K` | 查看文档 |
-| `<Space>rn` | 重命名 |
-| `<Space>ca` | 代码操作 |
-| `<Space>f` | 格式化代码 |
-| `gcc` | 注释/取消注释 |
-| `s` | 快速跳转 |
-| `<Ctrl+\>` | 打开终端 |
-
-### 文件管理 (Telescope)
-
-| 快捷键 | 功能 |
-|--------|------|
-| `<Space>ff` | 查找文件 |
-| `<Space>fg` | 实时搜索文本 |
-| `<Space>fb` | 查找缓冲区 |
-| `<Space>fr` | 最近文件 |
-| `<Space>fp` | 查找项目 |
-| `<Space>fk` | 查找快捷键 |
-| `<Space>fh` | 查找帮助 |
-
-### 窗口与导航
-
-| 快捷键 | 功能 |
-|--------|------|
-| `<Ctrl+h/j/k/l>` | 窗口间切换 |
-| `<Space>v` | 垂直分屏 |
-| `<Space>s` | 水平分屏 |
-| `<Ctrl+d/u>` | 翻半页并居中 |
-
-### Git 操作
-
-| 快捷键 | 功能 |
-|--------|------|
-| `<Space>hs` | 暂存 hunk |
-| `<Space>hr` | 重置 hunk |
-| `<Space>hp` | 预览修改 |
-| `<Space>hb` | 查看 blame |
-| `<Space>tb` | 切换 blame 显示 |
-
----
-
-## 🚀 快速开始
-
-### 安装要求
-
-- Neovim >= 0.9.0
-- Git
-- Nerd Font（用于显示图标）
-- ripgrep（用于 Telescope 实时搜索）
-- 编译工具（gcc/clang，用于 treesitter 编译）
-
-### 安装步骤
+### 前置依赖
 
 ```bash
-# 1. 备份原有配置
-mv ~/.config/nvim ~/.config/nvim.backup
+# 必需
+- Neovim >= 0.10
+- Git
+- fd (文件查找)
+- ripgrep (rg, 文本搜索)
 
-# 2. 克隆配置
-git clone <your-repo> ~/.config/nvim
+# 可选但推荐
+- Nerd Font (图标显示)
+- lazygit (Git TUI)
+- nodejs/npm (前端 LSP)
+- python/pip (Python LSP)
+```
 
-# 3. 启动 Neovim，插件会自动安装
+### 安装
+
+```bash
+# 首次启动会自动安装 lazy.nvim 和所有插件
 nvim
 ```
 
----
+### 最常用快捷键 (必须记住)
 
-## 📦 插件列表
-
-### 外观主题
-
-| 插件 | 描述 | 仓库 |
-|------|------|------|
-| **tokyonight.nvim** | 深色主题，支持多种变体 | folke/tokyonight.nvim |
-| **lualine.nvim** | 底部状态栏，显示文件信息、模式等 | nvim-lualine/lualine.nvim |
-| **bufferline.nvim** | 顶部缓冲区标签页，带图标 | akinsho/bufferline.nvim |
-| **indent-blankline.nvim** | 显示缩进对齐线 | lukas-reineke/indent-blankline.nvim |
-| **nvim-web-devicons** | 文件类型图标库 | nvim-tree/nvim-web-devicons |
-
-### 文件管理
-
-| 插件 | 描述 | 仓库 |
-|------|------|------|
-| **nvim-tree.lua** | 侧边文件树浏览器 | nvim-tree/nvim-tree.lua |
-| **telescope.nvim** | 模糊查找器，支持文件/文本/符号搜索 | nvim-telescope/telescope.nvim |
-| **telescope-fzf-native.nvim** | Telescope 的 fzf 排序引擎 | nvim-telescope/telescope-fzf-native.nvim |
-| **project.nvim** | 项目根目录自动检测和管理 | ahmedkhalf/project.nvim |
-| **auto-session** | 自动保存和恢复编辑会话 | rmagatti/auto-session |
-
-### 编辑增强
-
-| 插件 | 描述 | 仓库 |
-|------|------|------|
-| **nvim-treesitter** | 语法树解析，提供精准语法高亮 | nvim-treesitter/nvim-treesitter |
-| **nvim-autopairs** | 自动补全括号、引号等配对符号 | windwp/nvim-autopairs |
-| **Comment.nvim** | 快速注释/取消注释代码 | numToStr/Comment.nvim |
-| **nvim-surround** | 快速添加、修改、删除包围符号 | kylechui/nvim-surround |
-| **flash.nvim** | 快速跳转到任意位置 | folke/flash.nvim |
-| **mini.cursorword** | 高亮当前光标下的单词 | echasnovski/mini.cursorword |
-| **neoscroll.nvim** | 平滑滚动动画 | karb94/neoscroll.nvim |
-
-### 自动补全
-
-| 插件 | 描述 | 仓库 |
-|------|------|------|
-| **nvim-cmp** | 自动补全引擎主插件 | hrsh7th/nvim-cmp |
-| **cmp-nvim-lsp** | LSP 补全源 | hrsh7th/cmp-nvim-lsp |
-| **cmp-buffer** | 缓冲区文本补全源 | hrsh7th/cmp-buffer |
-| **cmp-path** | 文件路径补全源 | hrsh7th/cmp-path |
-| **cmp-cmdline** | 命令行补全源 | hrsh7th/cmp-cmdline |
-| **LuaSnip** | 代码片段引擎 | L3MON4D3/LuaSnip |
-| **cmp_luasnip** | LuaSnip 补全源 | saadparwaiz1/cmp_luasnip |
-
-### LSP 支持
-
-| 插件 | 描述 | 仓库 |
-|------|------|------|
-| **nvim-lspconfig** | LSP 服务器配置集合 | neovim/nvim-lspconfig |
-| **mason.nvim** | LSP/DAP/格式化工具安装管理器 | williamboman/mason.nvim |
-| **mason-lspconfig.nvim** | Mason 与 lspconfig 的桥梁 | williamboman/mason-lspconfig.nvim |
-
-### Python 开发
-
-| 插件 | 描述 | 仓库 |
-|------|------|------|
-| **conform.nvim** | 代码格式化工具，支持 ruff | stevearc/conform.nvim |
-| **nvim-lint** | 代码检查工具，支持 ruff | mfussenegger/nvim-lint |
-| **venv-selector.nvim** | Python 虚拟环境选择器，支持 venv/poetry/conda 等 | linux-cultist/venv-selector.nvim |
-| **pyright** (LSP) | Python 语言服务器，提供补全和类型检查 | microsoft/pyright |
-
-### Java 开发
-
-| 插件 | 描述 | 仓库 |
-|------|------|------|
-| **nvim-java** | 完整的 Java 开发环境，包含 LSP、DAP、测试等 | nvim-java/nvim-java |
-| **nvim-java-core** | Java 核心功能库 | nvim-java/nvim-java-core |
-| **nvim-java-test** | Java 测试运行支持 (JUnit) | nvim-java/nvim-java-test |
-| **nvim-java-dap** | Java 调试适配器 | nvim-java/nvim-java-dap |
-| **nvim-java-refactor** | Java 重构工具 | nvim-java/nvim-java-refactor |
-| **jdtls** (LSP) | Eclipse Java 语言服务器 | eclipse/eclipse.jdt.ls |
-| **google-java-format** | Java 代码格式化工具 | google/google-java-format |
-
-### Git 集成
-
-| 插件 | 描述 | 仓库 |
-|------|------|------|
-| **gitsigns.nvim** | 显示行内 Git 状态标记，支持 blame | lewis6991/gitsigns.nvim |
-
-### 工具辅助
-
-| 插件 | 描述 | 仓库 |
-|------|------|------|
-| **which-key.nvim** | 快捷键提示面板 | folke/which-key.nvim |
-| **toggleterm.nvim** | 浮动/底部终端集成 | akinsho/toggleterm.nvim |
-| **dressing.nvim** | 美化 vim.ui 选择/输入界面 | stevearc/dressing.nvim |
-| **nvim-notify** | 通知消息美化 | rcarriga/nvim-notify |
+| 快捷键 | 功能 | 场景 |
+|--------|------|------|
+| `Space` | Leader 键 | 所有命令前缀 |
+| `<leader>ff` | 查找文件 | 快速打开文件 |
+| `<leader>fg` | 全局搜索 | 搜索代码内容 |
+| `<leader>e` | 文件树 | 浏览项目结构 |
+| `gd` | 跳转到定义 | 代码导航 |
+| `gr` | 查找引用 | 查看哪里用了这个变量 |
+| `K` | 悬浮文档 | 查看函数文档 |
+| `<leader>rn` | 重命名 | 重构变量名 |
+| `<leader>ca` | 代码操作 | 自动修复/导入等 |
+| `<leader>cf` | 格式化 | 代码格式化 |
+| `<C-\>` | 终端 | 快速打开终端 |
 
 ---
 
-## ⌨️ 快捷键
+## 📁 文件管理
 
-> **说明**: `<leader>` 键默认为空格键 `Space`
-
-### 基础快捷键
-
-| 快捷键 | 模式 | 描述 |
-|--------|------|------|
-| `<C-h/j/k/l>` | Normal | 在窗口间切换（左/下/上/右） |
-| `<C-Up/Down/Left/Right>` | Normal | 调整窗口大小 |
-| `<C-d>` | Normal | 向下翻半页并居中 |
-| `<C-u>` | Normal | 向上翻半页并居中 |
-| `n/N` | Normal | 下一个/上一个搜索结果并居中 |
-| `<Esc>` | Normal | 取消搜索高亮 |
-| `J/K` (visual) | Visual | 移动选中的文本块 |
-| `p` (visual) | Visual | 粘贴后不替换寄存器 |
-| `<leader>w` | Normal | 保存文件 |
-| `<leader>q` | Normal | 退出 |
-| `<leader>Q` | Normal | 强制退出所有 |
-| `<leader>v` | Normal | 垂直分屏 |
-| `<leader>s` | Normal | 水平分屏 |
-| `<leader>ev` | Normal | 编辑 init.lua |
-| `<leader>sv` | Normal | 重载 init.lua |
-| `<leader>y` | Normal/Visual | 复制到系统剪贴板 |
-| `<leader>Y` | Normal | 复制整行到系统剪贴板 |
-| `<leader>p/P` | Normal/Visual | 从系统剪贴板粘贴 |
-| `<C-\>` | Normal | 打开/关闭终端 |
-
-### 文件管理
-
-| 快捷键 | 模式 | 描述 |
-|--------|------|------|
-| `<leader>e` | Normal | 切换文件树显示 |
-| `<leader>E` | Normal | 在文件树中定位当前文件 |
-
-### 缓冲区操作
-
-| 快捷键 | 模式 | 描述 |
-|--------|------|------|
-| `<leader>bn` | Normal | 下一个缓冲区 |
-| `<leader>bp` | Normal | 上一个缓冲区 |
-| `<leader>bd` | Normal | 删除当前缓冲区 |
-| `<leader>bw` | Normal | 彻底清除当前缓冲区 |
-
-### 搜索查找 (Telescope)
-
-| 快捷键 | 模式 | 描述 |
-|--------|------|------|
-| `<leader>ff` | Normal | 查找文件 |
-| `<leader>fg` | Normal | 实时搜索文本内容 |
-| `<leader>fb` | Normal | 查找缓冲区 |
-| `<leader>fh` | Normal | 查找帮助文档 |
-| `<leader>fr` | Normal | 查找最近打开的文件 |
-| `<leader>fc` | Normal | 查找命令 |
-| `<leader>fk` | Normal | 查找快捷键 |
-| `<leader>fs` | Normal | 查找当前文档符号 |
-| `<leader>fp` | Normal | 查找项目 |
-
-### LSP 相关
-
-| 快捷键 | 模式 | 描述 |
-|--------|------|------|
-| `gd` | Normal | 跳转到定义 |
-| `gD` | Normal | 跳转到声明 |
-| `gr` | Normal | 查找引用 |
-| `gi` | Normal | 跳转到实现 |
-| `K` | Normal | 显示悬停文档 |
-| `<leader>rn` | Normal | 重命名符号 |
-| `<leader>ca` | Normal | 代码操作（快速修复等） |
-| `<leader>f` | Normal | 格式化代码 |
-
-### Python 开发
-
-| 快捷键 | 模式 | 描述 |
-|--------|------|------|
-
-| `<leader>f` | Normal | 格式化代码（使用 ruff） |
-| `<leader>cf` | Normal/Visual | 手动格式化选中区域 |
-| `<leader>cl` | Normal | 手动运行代码检查 (ruff) |
-
-### Java 开发
-
-| 快捷键 | 模式 | 描述 |
-|--------|------|------|
-| `<leader>f` | Normal | 格式化代码（使用 google-java-format） |
-| `<leader>jo` | Normal | Java 按全限定名打开类 |
-| `<leader>jc` | Normal | Java 清理工作区 |
-| `<leader>jt` | Normal | Java 运行当前类测试 |
-| `<leader>jm` | Normal | Java 运行当前方法测试 |
-| `<leader>jv` | Normal | Java 查看测试报告 |
-| `gd` | Normal | 跳转到定义 |
-| `gr` | Normal | 查找引用 |
-| `gi` | Normal | 跳转到实现 |
-| `K` | Normal | 显示悬停文档 |
-| `<leader>rn` | Normal | 重命名符号 |
-| `<leader>ca` | Normal | 代码操作（快速修复等） |
-
-### Git 操作 (Gitsigns)
-
-| 快捷键 | 模式 | 描述 |
-|--------|------|------|
-| `<leader>hs` | Normal/Visual | 暂存 hunk |
-| `<leader>hr` | Normal/Visual | 重置 hunk |
-| `<leader>hS` | Normal | 暂存整个缓冲区 |
-| `<leader>hu` | Normal | 取消暂存 hunk |
-| `<leader>hR` | Normal | 重置整个缓冲区 |
-| `<leader>hp` | Normal | 预览 hunk |
-| `<leader>hb` | Normal | 显示当前行 blame |
-| `<leader>tb` | Normal | 切换 blame 显示 |
-| `<leader>hd` | Normal | 显示 diff |
-| `<leader>hD` | Normal | 显示与上一版本的 diff |
-| `<leader>td` | Normal | 切换已删除行的显示 |
-| `ih` | Operator/Visual | 选择 hunk 文本对象 |
-
-### 快速跳转 (Flash)
-
-| 快捷键 | 模式 | 描述 |
-|--------|------|------|
-| `s` | Normal/Visual/Operator | Flash 快速跳转 |
-| `S` | Normal/Visual/Operator | Flash Treesitter 跳转 |
-
----
-
-## 📖 插件使用说明
-
-### nvim-tree.lua - 文件树浏览器
-
-**功能**: 侧边栏文件浏览器，支持拖拽、重命名、创建删除文件等操作。
-
-**使用方法**:
-- 按 `<leader>e` 打开/关闭文件树
-- 按 `<leader>E` 在文件树中定位当前文件
-- 在文件树窗口中按 `g?` 显示所有快捷键
-
-**文件操作快捷键**:
-
-| 快捷键 | 功能 | 说明 |
-|--------|------|------|
-| `a` | 创建文件/目录 | 输入名称后按回车，以 `/` 结尾创建目录 |
-| `d` | 删除文件/目录 | 会弹出确认提示 |
-| `D` | 强制删除 | 不提示直接删除 |
-| `r` | 重命名文件 | 修改当前文件/目录名 |
-| `x` | 剪切 | 剪切到剪贴板 |
-| `c` | 复制 | 复制到剪贴板 |
-| `p` | 粘贴 | 粘贴剪贴板内容到当前目录 |
-| `y` | 复制文件名 | 复制文件名到系统剪贴板 |
-| `Y` | 复制相对路径 | 复制相对路径到系统剪贴板 |
-| `gy` | 复制绝对路径 | 复制绝对路径到系统剪贴板 |
-| `R` | 刷新 | 刷新文件树 |
-| `q` | 关闭 | 关闭文件树窗口 |
-
-**导航快捷键**:
+### Telescope (模糊查找)
 
 | 快捷键 | 功能 |
 |--------|------|
-| `<CR>` 或 `o` | 打开文件/展开折叠目录 |
-| `<C-v>` | 垂直分屏打开 |
-| `<C-x>` | 水平分屏打开 |
-| `<C-t>` | 在新标签页打开 |
-| `P` | 跳转到父目录 |
-| `<C-]>` | 进入目录 |
-| `<BS>` | 返回上级目录 |
-| `K` | 跳转到第一个子项 |
-| `J` | 跳转到最后一个子项 |
-| `I` | 切换隐藏文件显示 |
-| `H` | 切换点文件显示 |
-| `E` | 展开所有目录 |
-| `W` | 折叠所有目录 |
+| `<leader>ff` | 查找文件 |
+| `<leader>fg` | 全局搜索 (live grep) |
+| `<leader>fb` | 查找缓冲区 |
+| `<leader>fh` | 帮助标签 |
+| `<leader>fr` | 最近文件 |
+| `<leader>fc` | 命令列表 |
+| `<leader>fk` | 快捷键列表 |
+| `<leader>fs` | 文档符号 |
+| `<leader>fp` | 查找项目 |
+| `<leader>ft` | 查找 TODO |
+| `<leader>fy` | 剪贴板历史 |
 
-**示例**: 创建新文件
-```
-1. 按 <leader>e 打开文件树
-2. 导航到目标目录，按 a
-3. 输入文件名如 "newfile.lua" 按回车
-4. 或输入 "newfolder/" 创建目录
-```
-
-### Telescope - 模糊查找器
-
-**功能**: 强大的搜索工具，支持文件、文本、符号、Git 等多种搜索。
-
-**使用方法**:
-- 打开搜索窗口后，输入关键词进行过滤
-- `<C-n/p>` 或 `<Down/Up>` 上下移动选择
-- `<CR>` 确认选择
-- `<C-x>` 水平分屏打开
-- `<C-v>` 垂直分屏打开
-- `<C-t>` 在新标签页打开
-- `<C-c>` 取消
-
-### nvim-treesitter - 语法高亮
-
-**功能**: 基于语法树的精准高亮和代码分析。
-
-**已安装语言**: lua, python, javascript, typescript, c, cpp, go, rust, bash, json, yaml, toml, markdown, html, css, vim, vimdoc
-
-**使用方法**:
-- 自动启用语法高亮
-- 支持代码折叠（使用 `zc` 折叠，`zo` 展开）
-- `:TSInstall <language>` 安装新语言
-- `:TSUpdate` 更新所有语言解析器
-
-### Comment.nvim - 快速注释
-
-**功能**: 快速注释/取消注释代码。
-
-**使用方法**:
-- `gcc` - 注释当前行
-- `gc` + 动作 - 注释目标（如 `gcip` 注释段落）
-- `gc` (visual) - 注释选中区域
-- `gbc` - 块注释当前行
-- `gb` (visual) - 块注释选中区域
-
-### nvim-surround - 包围符号操作
-
-**功能**: 快速添加、修改、删除包围符号（括号、引号等）。
-
-**使用方法**:
-- `ys{motion}{char}` - 添加包围（如 `ysiw"` 给单词加引号）
-- `ys{motion}f{func}()` - 添加函数包围
-- `ds{char}` - 删除包围（如 `ds"` 删除引号）
-- `cs{old}{new}` - 修改包围（如 `cs"'` 双引号改单引号）
-- `S{char}` (visual) - 给选中区域加包围
-
-**示例**:
-```
-ysiw"    - 给当前单词添加双引号
-ysiw<div> - 给当前单词添加 HTML 标签
-ds"      - 删除双引号
-cs"'     - 双引号改为单引号
-```
-
-### flash.nvim - 快速跳转
-
-**功能**: 类似 vim-easymotion 的快速跳转工具。
-
-**使用方法**:
-- 按 `s` 进入跳转模式，然后输入目标字符，按提示标签跳转
-- 按 `S` 进入 Treesitter 模式，可选择语法节点
-
-### which-key.nvim - 快捷键提示
-
-**功能**: 输入 leader 键后显示可用快捷键列表。
-
-**使用方法**:
-- 按 `<leader>` 后等待片刻，会自动显示快捷键面板
-- 继续输入可过滤显示
-- `<Esc>` 关闭面板
-
-### toggleterm.nvim - 终端集成
-
-**功能**: 在 Neovim 内集成终端。
-
-**使用方法**:
-- `<C-\>` - 打开/关闭浮动终端
-- 在终端模式下按 `<Esc>` 退出终端模式
-- 支持多终端切换（需额外配置）
-
-### gitsigns.nvim - Git 集成
-
-**功能**: 显示文件修改标记，支持 blame、diff 预览、hunk 操作等。
-
-**界面符号**:
-- `+` - 新增行
-- `~` - 修改行
-- `_` - 删除行
-- `‾` - 顶部删除行
-
-**快捷键**:
-
-| 快捷键 | 模式 | 功能 |
-|--------|------|------|
-| `<leader>hs` | Normal/Visual | 暂存 hunk (stage) |
-| `<leader>hr` | Normal/Visual | 重置 hunk (reset) |
-| `<leader>hS` | Normal | 暂存整个缓冲区 |
-| `<leader>hu` | Normal | 取消暂存 hunk (unstage) |
-| `<leader>hR` | Normal | 重置整个缓冲区 |
-| `<leader>hp` | Normal | 预览 hunk 修改 |
-| `<leader>hb` | Normal | 显示当前行 blame |
-| `<leader>tb` | Normal | 切换 blame 显示模式 |
-| `<leader>hd` | Normal | 显示 diff |
-| `<leader>hD` | Normal | 显示与上一版本的 diff |
-| `<leader>td` | Normal | 切换已删除行的显示 |
-| `]c` | Normal | 跳转到下一个修改 |
-| `[c` | Normal | 跳转到上一个修改 |
-| `ih` | Operator/Visual | 选择 hunk 文本对象 |
-
-**常用操作示例**:
-
-```
-查看修改:
-1. 打开一个有修改的文件
-2. 左侧会显示修改标记 (+/~/_)
-3. 按 ]c 跳转到下一个修改，[c 跳转到上一个
-
-暂存部分修改:
-1. 将光标移到要暂存的修改块
-2. 按 <leader>hs 暂存当前 hunk
-3. 或进入 visual 模式选择多行后按 <leader>hs
-
-查看 blame:
-1. 按 <leader>hb 查看当前行是谁修改的
-2. 按 <leader>tb 开启/关闭行内 blame 显示
-
-撤销修改:
-1. 将光标移到要撤销的修改
-2. 按 <leader>hr 重置该 hunk 到上次提交状态
-3. 或按 <leader>hR 重置整个文件
-
-预览修改:
-1. 将光标移到修改处
-2. 按 <leader>hp 弹出修改对比窗口
-```
-
----
-
-### 其他常用 Git 插件推荐
-
-如果你需要更强大的 Git 功能，可以考虑添加以下插件：
-
-#### vim-fugitive - 全面的 Git 命令封装
-
-```lua
--- 添加到 lazy.nvim 配置
-{ "tpope/vim-fugitive" }
-```
-
-**常用命令**:
-| 命令 | 功能 |
-|------|------|
-| `:G` 或 `:Git` | 查看 Git 状态窗口 |
-| `:Gdiffsplit` | 查看 diff |
-| `:Gwrite` | 相当于 `git add %` |
-| `:Gread` | 撤销当前文件修改 |
-| `:Gcommit` | 提交 |
-| `:Gpush` | 推送 |
-| `:Gpull` | 拉取 |
-| `:Gblame` | 查看 blame |
-| `:Gclog` | 查看当前文件提交历史 |
-
-#### neogit - Magit 风格的 Git 界面
-
-```lua
--- 添加到 lazy.nvim 配置
-{
-  "NeogitOrg/neogit",
-  dependencies = { "nvim-lua/plenary.nvim" },
-  config = true
-}
-```
-
-**使用**:
-- `:Neogit` - 打开主界面
-- 界面内按 `?` 查看快捷键
-- `s` - stage, `u` - unstage, `c` - commit, `p` - push, `P` - pull
-
-#### diffview.nvim - 查看 diff 和文件历史
-
-```lua
--- 添加到 lazy.nvim 配置
-{
-  "sindrets/diffview.nvim",
-  dependencies = { "nvim-lua/plenary.nvim" }
-}
-```
-
-**常用命令**:
-| 命令 | 功能 |
-|------|------|
-| `:DiffviewOpen` | 打开 diff 视图 |
-| `:DiffviewClose` | 关闭 diff 视图 |
-| `:DiffviewFileHistory` | 查看文件历史 |
-| `:DiffviewFileHistory %` | 查看当前文件历史 |
-
-#### lazygit.nvim - 集成 lazygit 终端
-
-```lua
--- 需要先安装 lazygit: https://github.com/jesseduffield/lazygit
-{
-  "kdheepak/lazygit.nvim",
-  dependencies = { "nvim-lua/plenary.nvim" },
-  config = function()
-    vim.keymap.set("n", "<leader>gg", ":LazyGit<CR>", { desc = "Open LazyGit" })
-  end
-}
-```
-
-**使用**:
-- `:LazyGit` - 打开 lazygit 界面
-- `:LazyGitCurrentFile` - 查看当前文件历史
-
-### nvim-cmp - 自动补全
-
-**功能**: 代码自动补全引擎。
-
-**使用方法**:
-- `<C-Space>` - 手动触发补全
-- `<C-n/p>` - 上下选择补全项
+**Telescope 操作** (在 Telescope 窗口中)
+- `<C-j>` / `<C-k>` - 上下移动
 - `<CR>` - 确认选择
-- `<Tab>` - 确认或选择下一个
-- `<C-e>` - 取消补全
-- `<C-b/f>` - 滚动文档
+- `<C-x>` - 水平分屏打开
+- `<C-v>` - 垂直分屏打开
+- `<C-t>` - 新标签打开
 
-### Mason - LSP 管理器
+### NvimTree (文件树)
 
-**功能**: 图形化安装和管理 LSP 服务器、DAP、格式化工具等。
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>e` | 切换文件树 |
+| `<leader>E` | 在文件树中定位当前文件 |
 
-**使用方法**:
-- `:Mason` - 打开管理界面
-- `i` - 安装选中的工具
-- `u` - 更新
-- `X` - 卸载
-- `g?` - 显示帮助
+**文件树操作** (在 NvimTree 中)
+- `Enter` / `o` - 打开文件/展开目录
+- `a` - 新建文件
+- `d` - 删除
+- `r` - 重命名
+- `x` - 剪切
+- `c` - 复制
+- `p` - 粘贴
+- `y` - 复制文件名
+- `Y` - 复制相对路径
+- `gy` - 复制绝对路径
 
-### Python 开发配置
+---
 
-本配置为 Python 开发提供了完整的支持：
+## 🔧 代码编辑
 
-**功能**: 
-- **代码补全**: 基于 pyright 的智能补全和类型检查
-- **代码格式化**: 使用 ruff 自动格式化，保存时自动触发
-- **代码检查**: 使用 ruff 检测代码问题（未使用导入、语法错误等）
-- **虚拟环境管理**: 使用 venv-selector 快速切换 Python 虚拟环境
+### LSP (语言服务器)
 
-**快捷键**:
+| 快捷键 | 功能 |
+|--------|------|
+| `gd` | 跳转到定义 |
+| `gD` | 跳转到声明 |
+| `gr` | 查找引用 |
+| `gi` | 跳转到实现 |
+| `K` | 悬浮文档 |
+| `<leader>rn` | 重命名符号 |
+| `<leader>ca` | 代码操作 |
+| `<leader>f` | 格式化代码 |
+| `<leader>cf` | 格式化 (与 conform 共用) |
 
-| 快捷键 | 模式 | 功能 |
+**前端专属**
+| `<leader>co` | 组织导入 |
+| `<leader>cx` | 修复所有可自动修复的问题 |
+| `<leader>cr` | 重命名下一个匹配 |
+
+### 代码补全 (nvim-cmp)
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<C-Space>` | 触发补全 |
+| `<C-j>` / `<C-k>` | 选择下/上一个选项 |
+| `<CR>` | 确认选择 |
+| `<Tab>` | 确认或下一个 |
+| `<S-Tab>` | 上一个 |
+| `<C-b>` / `<C-f>` | 滚动文档 |
+| `<C-e>` | 取消补全 |
+
+### 编辑增强
+
+| 快捷键 | 功能 | 插件 |
 |--------|------|------|
+| `gcc` | 切换行注释 | Comment.nvim |
+| `gc` (visual) | 切换注释 | Comment.nvim |
+| `s` | 快速跳转 (Flash) | flash.nvim |
+| `S` | Treesitter 选择 | flash.nvim |
+| `ys{motion}{char}` | 添加包围符号 | nvim-surround |
+| `ds{char}` | 删除包围符号 | nvim-surround |
+| `cs{old}{new}` | 修改包围符号 | nvim-surround |
+| `p` / `P` | 粘贴 (增强版) | yanky.nvim |
+| `<C-p>` | 上一个粘贴历史 | yanky.nvim |
+| `<C-n>` | 下一个粘贴历史 | yanky.nvim |
 
-| `<leader>f` | Normal | 格式化整个文件 |
-| `<leader>cf` | Normal/Visual | 格式化选中区域 |
-| `<leader>cl` | Normal | 手动运行代码检查 |
+### 格式化 (Conform)
 
-**使用方法**:
-- 打开 Python 文件时自动启用
-- 保存文件时自动格式化代码
-- 代码问题会显示在左侧标记栏和诊断列表中
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>cf` | 格式化代码 |
 
-**虚拟环境管理 (venv-selector)**:
+**自动格式化**: 保存时自动格式化 (Python/前端/Java)
 
-该功能让你在 Neovim 内部快速切换 Python 虚拟环境，无需重启编辑器。
+### 代码检查 (Linting)
 
-**支持的虚拟环境类型**:
-- `venv` / `virtualenv` - 标准虚拟环境
-- `poetry` - Poetry 项目环境
-- `pdm` - PDM 项目环境
-- `conda` - Conda 环境
-- `hatch` - Hatch 项目环境
-- `pipenv` - Pipenv 环境
-
-**常用命令**:
-
-| 命令 | 功能 |
-|------|------|
-| `:VenvSelect` | 打开虚拟环境选择器 |
-| `:VenvSelectCached` | 选择之前使用的虚拟环境 |
-
-**使用流程**:
-
-```
-1. 在项目中创建虚拟环境（如: uv venv .venv 或 poetry init）
-2. 在 Neovim 中打开 Python 文件
-3. 运行 :VenvSelect 命令打开虚拟环境选择器
-4. 使用 Telescope 搜索并选择要激活的环境
-5. LSP 、格式化器、lint 将自动使用新环境
-```
-
-**配置示例** - 自定义搜索路径（在 init.lua 中）:
-
-```lua
-require("venv-selector").setup({
-  settings = {
-    search = {
-      my_venvs = {
-        command = "fd 'python$' ~/.venvs --full-path --color never -L",
-      },
-    },
-  },
-})
-```
-
-**常见问题**:
-- 如果格式化不工作，确保 ruff 已安装: `pip install ruff`
-- 检查 ruff 路径: `:checkhealth conform`
-- 虚拟环境切换后 LSP 需要重新加载缓冲区才能生效：`:e`
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>cl` | 手动运行 Linter |
 
 ---
 
-### Java 开发配置
+## 🌲 Git 集成
 
-本配置为 Java 开发提供了完整的支持，基于 `nvim-java` 插件套件：
+### Gitsigns (行级 Git 状态)
 
-**功能**:
-- **代码补全**: 基于 jdtls 的智能补全和类型检查
-- **代码格式化**: 使用 google-java-format 自动格式化，保存时自动触发
-- **代码导航**: 跳转到定义、查找引用、跳转到实现等
-- **重构支持**: 重命名、提取方法、内联变量等重构操作
-- **测试运行**: 支持 JUnit 测试运行和调试
-- **调试支持**: 集成 DAP，支持断点调试
-- **Spring Boot**: 支持 Spring Boot 项目开发
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>hs` | Stage hunk |
+| `<leader>hr` | Reset hunk |
+| `<leader>hS` | Stage 整个缓冲区 |
+| `<leader>hu` | Undo stage hunk |
+| `<leader>hR` | Reset 缓冲区 |
+| `<leader>hp` | 预览 hunk |
+| `<leader>hb` | Blame 行 |
+| `<leader>tb` | 切换 blame 显示 |
+| `<leader>hd` | Diff |
+| `ih` (文本对象) | 选择 hunk |
 
-**依赖要求**:
-- Java 17+ (已配置好 JAVA_HOME)
-- Maven 或 Gradle 项目
+### LazyGit (Git TUI)
 
-**快捷键**:
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>gg` | 打开 LazyGit |
+| `<leader>gf` | 当前文件历史 |
+| `<leader>gc` | 提交筛选 |
+| `<leader>gC` | 当前文件提交筛选 |
 
-| 快捷键 | 模式 | 功能 |
-|--------|------|------|
-| `<leader>f` | Normal | 格式化整个文件 |
-| `<leader>jo` | Normal | 按全限定名打开类 |
-| `<leader>jc` | Normal | 清理工作区 |
-| `<leader>jt` | Normal | 运行当前类测试 |
-| `<leader>jm` | Normal | 运行当前方法测试 |
-| `<leader>jv` | Normal | 查看测试报告 |
-| `gd` | Normal | 跳转到定义 |
-| `gD` | Normal | 跳转到声明 |
-| `gr` | Normal | 查找引用 |
-| `gi` | Normal | 跳转到实现 |
-| `K` | Normal | 显示悬停文档 |
-| `<leader>rn` | Normal | 重命名符号 |
-| `<leader>ca` | Normal | 代码操作（快速修复等） |
+### Diffview
 
-**使用方法**:
-
-1. **打开项目**:
-   ```bash
-   cd /path/to/your/maven-or-gradle-project
-   nvim .
-   ```
-
-2. **首次启动**:
-   - 打开 Java 文件时会自动下载 jdtls 和相关工具
-   - 首次打开项目需要等待依赖下载完成
-   - 右下角会显示加载进度
-
-3. **运行测试**:
-   - 将光标放在测试类中，按 `<leader>jt` 运行整个类的测试
-   - 将光标放在测试方法中，按 `<leader>jm` 运行单个测试方法
-   - 按 `<leader>jv` 查看测试报告
-
-4. **清理工作区**:
-   - 如果遇到奇怪的问题，按 `<leader>jc` 清理工作区
-   - 这会清除 jdtls 的索引和缓存
-
-**项目结构要求**:
-
-nvim-java 会自动检测以下项目根目录标记：
-- `pom.xml` (Maven 项目)
-- `build.gradle` / `build.gradle.kts` (Gradle 项目)
-- `.git` (Git 仓库)
-
-**Spring Boot 支持**:
-
-如果项目包含 Spring Boot，nvim-java 会自动启用 Spring Boot Tools 支持：
-- 自动配置提示
-- 属性文件补全
-- 代码导航增强
-
-**常见问题**:
-
-1. **LSP 无法启动**:
-   - 检查 JAVA_HOME 是否正确设置: `echo $JAVA_HOME`
-   - 确保 Java 版本是 17+: `java -version`
-   - 检查项目是否有 pom.xml 或 build.gradle
-
-2. **格式化不工作**:
-   - 在 Mason 中安装 google-java-format: `:Mason` → 找到 google-java-format → `i` 安装
-   - 检查配置: `:checkhealth conform`
-
-3. **测试运行失败**:
-   - 确保项目中包含 JUnit 依赖
-   - 检查 Maven/Gradle 是否能正常编译: `mvn compile` 或 `./gradlew compileJava`
-
-4. **内存不足**:
-   - jdtls 默认使用较多内存，可以在配置中调整 JVM 参数
-   - 编辑 init.lua 中的 nvim-java 配置，添加 jdtls 内存设置
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>gd` | Git diff 视图 |
+| `<leader>gh` | 文件历史 |
+| `<leader>gH` | 当前文件历史 |
+| `<leader>gq` | 关闭 diffview |
 
 ---
 
-### nvim-lspconfig - LSP 配置
+## 🎯 高效工具
 
-**功能**: 配置语言服务器协议支持。
+### Harpoon (快速文件标记)
 
-**使用方法**:
-- 自动为已安装的语言服务器提供代码分析功能
-- 详见快捷键表中的 LSP 相关快捷键
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>ha` | 添加当前文件到标记 |
+| `<leader>hm` | 打开标记菜单 |
+| `<leader>1~5` | 跳转到标记 1-5 |
+| `<leader>hn` | 下一个标记 |
+| `<leader>hp` | 上一个标记 |
+
+### Spectre (全局搜索替换)
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>sr` | 打开 Spectre |
+| `<leader>sw` | 搜索当前单词 |
+
+**Spectre 内操作**
+- `dd` - 切换选择行
+- `<CR>` - 打开文件
+- `<leader>r` - 全部替换
+- `<leader>rc` - 替换当前行
+
+### TODO Comments
+
+| 快捷键 | 功能 |
+|--------|------|
+| `]t` | 下一个 TODO |
+| `[t` | 上一个 TODO |
+| `<leader>ft` | 查找所有 TODO |
+| `<leader>fT` | TODO 列表 |
+
+**支持标签**: `TODO`, `FIX`, `HACK`, `WARN`, `PERF`, `NOTE`, `TEST`
+
+### Trouble (诊断列表)
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>xx` | 工作区诊断 |
+| `<leader>xX` | 当前缓冲区诊断 |
+| `<leader>xs` | 符号列表 |
+| `<leader>xl` | LSP 定义/引用 |
+| `<leader>xL` | Location List |
+| `<leader>xQ` | Quickfix List |
+
+### Marks (标记管理)
+
+| 快捷键 | 功能 |
+|--------|------|
+| `m,` | 设置下一个标记 |
+| `m]` | 下一个标记 |
+| `m:` | 预览标记 |
+| `<leader>mm` | 列出缓冲区标记 |
+| `<leader>mM` | 列出全局标记 |
+| `<leader>mx` | 删除缓冲区标记 |
+| `<leader>mX` | 删除行标记 |
 
 ---
 
-## 🔧 自定义配置
+## 🪟 窗口管理
 
-配置文件位于 `~/.config/nvim/init.lua`，可根据需要修改：
+### Smart Splits (智能窗口分割)
 
-1. **添加新插件**: 在 `require("lazy").setup({...})` 中添加插件配置
-2. **修改主题**: 更换 `tokyonight.nvim` 为其他主题插件
-3. **调整快捷键**: 在文件底部的基础快捷键区域修改
-4. **LSP 服务器**: 在 LSP 配置段添加所需的服务器
+| 快捷键 | 功能 |
+|--------|------|
+| `<C-h>` | 左移 |
+| `<C-j>` | 下移 |
+| `<C-k>` | 上移 |
+| `<C-l>` | 右移 |
+| `<A-h>` | 向左调整大小 |
+| `<A-j>` | 向下调整大小 |
+| `<A-k>` | 向上调整大小 |
+| `<A-l>` | 向右调整大小 |
+| `<leader><leader>h` | 与左窗口交换 |
+| `<leader><leader>j` | 与下窗口交换 |
+| `<leader><leader>k` | 与上窗口交换 |
+| `<leader><leader>l` | 与右窗口交换 |
 
----
+### 基础窗口操作
 
-## 📝 常见问题
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>v` | 垂直分屏 |
+| `<leader>s` | 水平分屏 |
+| `<C-Up>` | 增加高度 |
+| `<C-Down>` | 减少高度 |
+| `<C-Left>` | 减少宽度 |
+| `<C-Right>` | 增加宽度 |
 
-### Q: 图标显示为方块或问号？
+### 终端
 
-A: 需要安装 Nerd Font 并在终端中启用。推荐字体：
-- FiraCode Nerd Font
-- JetBrainsMono Nerd Font
-- Hack Nerd Font
-
-### Q: Telescope 实时搜索很慢？
-
-A: 确保已安装 ripgrep (`rg` 命令)，它会大幅提升搜索性能。
-
-### Q: 如何安装新的语言支持？
-
-A: 运行 `:TSInstall <language>` 安装 treesitter 支持，
-在 Mason (`:Mason`) 中安装对应的 LSP 服务器。
-
-### Q: 插件没有自动安装？
-
-A: 首次启动时 lazy.nvim 会自动安装，如果失败可以：
-1. 删除 `~/.local/share/nvim/lazy` 目录
-2. 重新启动 Neovim
-
----
-
-## 📄 许可证
-
-MIT License
+| 快捷键 | 功能 |
+|--------|------|
+| `<C-\>` | 切换浮动终端 |
+| `<Esc>` (终端模式) | 退出终端模式 |
 
 ---
 
-## 🙏 致谢
+## 🎨 UI 与主题
 
-- [lazy.nvim](https://github.com/folke/lazy.nvim) - 强大的插件管理器
-- [Neovim](https://neovim.io/) - 优秀的编辑器
-- 所有插件作者
+### 主题切换
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>ut` | 切换主题 |
+
+**可用主题**: TokyoNight (默认), Catppuccin
+
+### 其他 UI 切换
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>z` | Zen Mode (专注模式) |
+| `<leader>tw` | Twilight (聚焦当前代码) |
+| `<leader>tb` | 透明背景 |
+
+### 代码折叠 (UFO)
+
+| 快捷键 | 功能 |
+|--------|------|
+| `zR` | 展开所有折叠 |
+| `zM` | 折叠所有 |
+| `zr` | 展开指定级别外 |
+| `zm` | 折叠指定级别 |
+| `K` (在折叠行) | 预览折叠内容 |
+
+---
+
+## 🔍 其他实用功能
+
+### 缓冲区操作
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>bn` | 下一个缓冲区 |
+| `<leader>bp` | 上一个缓冲区 |
+| `<leader>bd` | 删除缓冲区 |
+| `<leader>bw` | 彻底删除缓冲区 |
+
+### 文件操作
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>w` | 保存 |
+| `<leader>q` | 退出 |
+| `<leader>Q` | 强制退出所有 |
+| `<leader>ev` | 编辑配置文件 |
+| `<leader>sv` | 重新加载配置 |
+
+### 系统剪贴板
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>y` | 复制到系统剪贴板 |
+| `<leader>Y` | 复制行到系统剪贴板 |
+| `<leader>p` | 从系统剪贴板粘贴 |
+| `<leader>P` | 从系统剪贴板粘贴到前面 |
+
+### 导航
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<C-d>` | 半页下 (居中) |
+| `<C-u>` | 半页上 (居中) |
+| `n` | 下一个匹配 (居中) |
+| `N` | 上一个匹配 (居中) |
+| `<Esc>` | 取消搜索高亮 |
+
+### 可视模式
+
+| 快捷键 | 功能 |
+|--------|------|
+| `J` | 将选中行下移 |
+| `K` | 将选中行上移 |
+| `p` | 粘贴 (不替换寄存器) |
+
+---
+
+## 🐍 Python 开发
+
+### 虚拟环境选择器
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>ve` | 选择 Python 虚拟环境 |
+| `<leader>vc` | 选择缓存的虚拟环境 |
+
+---
+
+## ☕ Java 开发
+
+### Java 专属命令
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>jo` | 通过完整类名打开类 |
+| `<leader>jc` | 清理工作区 |
+| `<leader>jt` | 测试当前类 |
+| `<leader>jm` | 测试当前方法 |
+| `<leader>jv` | 查看测试报告 |
+
+---
+
+## 🌐 前端开发
+
+### 快速打开
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>ep` | 打开 package.json |
+| `<leader>ob` | 在浏览器中打开当前文件 |
+
+### LSP 操作
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<leader>co` | 组织导入 |
+| `<leader>cx` | 修复所有可自动修复的问题 |
+| `<leader>cr` | 重命名下一个匹配 |
+
+---
+
+## 📋 启动页 (Alpha)
+
+启动 Neovim 时显示的快捷菜单：
+
+| 快捷键 | 功能 |
+|--------|------|
+| `f` | 查找文件 |
+| `e` | 新建文件 |
+| `p` | 项目 |
+| `r` | 最近文件 |
+| `t` | 查找文本 |
+| `c` | 编辑配置 |
+| `q` | 退出 |
+
+---
+
+## 🔧 插件列表
+
+### 外观主题
+- `tokyonight.nvim` - TokyoNight 主题
+- `catppuccin/nvim` - Catppuccin 主题
+- `lualine.nvim` - 状态栏
+- `bufferline.nvim` - 缓冲区标签页
+- `alpha-nvim` - 启动页
+- `nvim-web-devicons` - 文件图标
+
+### 文件管理
+- `nvim-tree.lua` - 文件树
+- `telescope.nvim` - 模糊查找
+- `telescope-fzf-native.nvim` - fzf 算法支持
+- `telescope-ui-select.nvim` - UI 选择器
+- `project.nvim` - 项目管理
+
+### 编辑增强
+- `nvim-treesitter` - 语法高亮
+- `nvim-ts-autotag` - 自动标签闭合
+- `nvim-autopairs` - 自动括号配对
+- `Comment.nvim` - 快速注释
+- `nvim-surround` - 包围符号操作
+- `flash.nvim` - 快速跳转
+- `yanky.nvim` - 剪贴板历史
+- `nvim-ufo` - 代码折叠
+- `indent-blankline.nvim` - 缩进线
+
+### LSP & 补全
+- `nvim-lspconfig` - LSP 配置
+- `mason.nvim` - LSP 管理器
+- `mason-lspconfig.nvim` - Mason LSP 配置
+- `nvim-cmp` - 补全引擎
+- `cmp-nvim-lsp` - LSP 补全源
+- `cmp-buffer` - 缓冲区补全源
+- `cmp-path` - 路径补全源
+- `cmp-cmdline` - 命令行补全源
+- `LuaSnip` - 代码片段
+- `cmp_luasnip` - 片段补全源
+- `lspkind.nvim` - 补全图标
+- `fidget.nvim` - LSP 进度指示器
+
+### 代码质量
+- `conform.nvim` - 代码格式化
+- `nvim-lint` - 代码检查
+- `venv-selector.nvim` - Python 虚拟环境
+- `nvim-java` - Java 开发环境
+
+### Git
+- `gitsigns.nvim` - Git 标记
+- `lazygit.nvim` - LazyGit 集成
+- `diffview.nvim` - Diff 视图
+
+### 工具增强
+- `which-key.nvim` - 快捷键提示
+- `toggleterm.nvim` - 终端集成
+- `auto-session` - 会话管理
+- `mini.cursorword` - 高亮当前单词
+- `neoscroll.nvim` - 平滑滚动
+- `dressing.nvim` - UI 选择增强
+- `nvim-notify` - 通知增强
+- `noice.nvim` - 命令行/消息 UI
+- `rainbow-delimiters.nvim` - 彩虹括号
+- `nvim-scrollbar` - 滚动条
+- `highlight-undo.nvim` - 撤销高亮
+- `smear-cursor.nvim` - 光标动画
+- `wilder.nvim` - 命令行补全
+- `transparent.nvim` - 透明背景
+- `neoconf.nvim` - 本地配置管理
+
+### 高效工具
+- `harpoon` - 快速文件标记
+- `nvim-spectre` - 全局搜索替换
+- `todo-comments.nvim` - TODO 注释
+- `trouble.nvim` - 诊断列表
+- `vim-illuminate` - 单词高亮
+- `nvim-treesitter-context` - 上下文显示
+- `barbecue.nvim` - 面包屑导航
+- `smart-splits.nvim` - 智能窗口分割
+- `nvim-bqf` - Quickfix 增强
+- `marks.nvim` - 标记管理
+- `nvim-colorizer.lua` - 颜色代码高亮
+- `zen-mode.nvim` - 专注模式
+- `twilight.nvim` - 代码聚焦
+- `live-command.nvim` - 命令实时预览
+
+---
+
+## 💡 提示
+
+1. **记住 Leader 键是空格 `<Space>`**
+2. **`<leader>fk`** 可以查看所有快捷键
+3. **which-key** 会在输入 leader 键后显示可用命令
+4. **Telescope** 是最常用的文件/文本查找工具
+5. **Harpoon** 可以标记常用文件，用 `<leader>1-5>` 快速跳转
