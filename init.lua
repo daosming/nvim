@@ -284,6 +284,41 @@ require("lazy").setup({
   },
 
   -- ============================================
+  -- Python 虚拟环境选择器
+  -- ============================================
+  {
+    "linux-cultist/venv-selector.nvim",
+    dependencies = {
+      "neovim/nvim-lspconfig",
+      "nvim-telescope/telescope.nvim",
+      "mfussenegger/nvim-dap-python",
+    },
+    branch = "regexp",
+    event = "VeryLazy",
+    config = function()
+      require("venv-selector").setup({
+        settings = {
+          search = {
+            my_venvs = {
+              command = "fd 'python$' ~/.venvs --full-path --color never -L",
+            },
+          },
+          options = {
+            on_telescope_result_callback = function(filepath)
+              return require("venv-selector").utils.remove_last_slash(filepath)
+            end,
+            notify_user_on_venv_activation = true,
+          },
+        },
+      })
+    end,
+    keys = {
+      { "<leader>vs", "<cmd>VenvSelect<cr>", desc = "Select Python venv" },
+      { "<leader>vc", "<cmd>VenvSelectCached<cr>", desc = "Select cached venv" },
+    },
+  },
+
+  -- ============================================
   -- 代码检查 (Linting)
   -- ============================================
   {

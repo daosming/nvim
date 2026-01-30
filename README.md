@@ -51,6 +51,7 @@
 | `gcc` | 注释/取消注释 |
 | `s` | 快速跳转 |
 | `<Ctrl+\>` | 打开终端 |
+| `<Space>vs` | 选择 Python 虚拟环境 |
 
 ### 文件管理 (Telescope)
 
@@ -170,6 +171,7 @@ nvim
 |------|------|------|
 | **conform.nvim** | 代码格式化工具，支持 ruff | stevearc/conform.nvim |
 | **nvim-lint** | 代码检查工具，支持 ruff | mfussenegger/nvim-lint |
+| **venv-selector.nvim** | Python 虚拟环境选择器，支持 venv/poetry/conda 等 | linux-cultist/venv-selector.nvim |
 | **pyright** (LSP) | Python 语言服务器，提供补全和类型检查 | microsoft/pyright |
 
 ### Git 集成
@@ -264,6 +266,8 @@ nvim
 
 | 快捷键 | 模式 | 描述 |
 |--------|------|------|
+| `<leader>vs` | Normal | 选择 Python 虚拟环境 |
+| `<leader>vc` | Normal | 选择缓存的虚拟环境 |
 | `<leader>f` | Normal | 格式化代码（使用 ruff） |
 | `<leader>cf` | Normal/Visual | 手动格式化选中区域 |
 | `<leader>cl` | Normal | 手动运行代码检查 (ruff) |
@@ -593,11 +597,14 @@ cs"'     - 双引号改为单引号
 - **代码补全**: 基于 pyright 的智能补全和类型检查
 - **代码格式化**: 使用 ruff 自动格式化，保存时自动触发
 - **代码检查**: 使用 ruff 检测代码问题（未使用导入、语法错误等）
+- **虚拟环境管理**: 使用 venv-selector 快速切换 Python 虚拟环境
 
 **快捷键**:
 
 | 快捷键 | 模式 | 功能 |
 |--------|------|------|
+| `<leader>vs` | Normal | 选择 Python 虚拟环境 |
+| `<leader>vc` | Normal | 选择缓存的虚拟环境 |
 | `<leader>f` | Normal | 格式化整个文件 |
 | `<leader>cf` | Normal/Visual | 格式化选中区域 |
 | `<leader>cl` | Normal | 手动运行代码检查 |
@@ -607,9 +614,53 @@ cs"'     - 双引号改为单引号
 - 保存文件时自动格式化代码
 - 代码问题会显示在左侧标记栏和诊断列表中
 
+**虚拟环境管理 (venv-selector)**:
+
+该功能让你在 Neovim 内部快速切换 Python 虚拟环境，无需重启编辑器。
+
+**支持的虚拟环境类型**:
+- `venv` / `virtualenv` - 标准虚拟环境
+- `poetry` - Poetry 项目环境
+- `pdm` - PDM 项目环境
+- `conda` - Conda 环境
+- `hatch` - Hatch 项目环境
+- `pipenv` - Pipenv 环境
+
+**常用命令**:
+
+| 命令 | 功能 |
+|------|------|
+| `:VenvSelect` | 打开虚拟环境选择器 |
+| `:VenvSelectCached` | 选择之前使用的虚拟环境 |
+
+**使用流程**:
+
+```
+1. 在项目中创建虚拟环境（如: uv venv .venv 或 poetry init）
+2. 在 Neovim 中打开 Python 文件
+3. 按 <leader>vs 打开虚拟环境选择器
+4. 使用 Telescope 搜索并选择要激活的环境
+5. LSP 、格式化器、lint 将自动使用新环境
+```
+
+**配置示例** - 自定义搜索路径（在 init.lua 中）:
+
+```lua
+require("venv-selector").setup({
+  settings = {
+    search = {
+      my_venvs = {
+        command = "fd 'python$' ~/.venvs --full-path --color never -L",
+      },
+    },
+  },
+})
+```
+
 **常见问题**:
 - 如果格式化不工作，确保 ruff 已安装: `pip install ruff`
 - 检查 ruff 路径: `:checkhealth conform`
+- 虚拟环境切换后 LSP 需要重新加载缓冲区才能生效：`:e`
 
 ---
 
