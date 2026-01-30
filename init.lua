@@ -312,10 +312,7 @@ require("lazy").setup({
         },
       })
     end,
-    keys = {
-      { "<leader>oe", "<cmd>VenvSelect<cr>", desc = "Select Python venv" },
-      { "<leader>oc", "<cmd>VenvSelectCached<cr>", desc = "Select cached venv" },
-    },
+
   },
 
   -- ============================================
@@ -465,7 +462,7 @@ require("lazy").setup({
         { "<leader>h", group = "Git Hunk" },
         { "<leader>t", group = "Toggle" },
         { "<leader>c", group = "Code" },
-        { "<leader>o", group = "Python/Env" },
+
         { "<leader>e", desc = "File tree" },
         { "<leader>rn", desc = "Rename" },
         { "<leader>ca", desc = "Code action" },
