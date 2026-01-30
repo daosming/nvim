@@ -347,7 +347,9 @@ require("lazy").setup({
     end,
     config = function()
       local wk = require("which-key")
-      wk.setup()
+      wk.setup({
+        triggers = {}, -- 禁用所有自动触发（包括 <leader> 键）
+      })
       
       -- 注册快捷键分组
       wk.add({

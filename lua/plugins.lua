@@ -25,13 +25,36 @@ return {
     end,
   },
   
-  -- 示例：LSP 配置
+  -- LSP 配置
   {
     "neovim/nvim-lspconfig",
     config = function()
       local lspconfig = require("lspconfig")
-      -- 配置具体 LSP 服务器
-      -- lspconfig.lua_ls.setup({})
+      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+      -- C/C++ LSP: clangd
+      lspconfig.clangd.setup({
+        capabilities = capabilities,
+        cmd = {
+          "clangd",
+          "--background-index",      -- 后台索引整个项目
+          "--clang-tidy",            -- 启用 clang-tidy 检查
+          "--header-insertion=iwyu", -- 自动插入头文件
+          "--completion-style=bundled",
+          "--pch-storage=memory",    -- 预编译头存内存，提升速度
+          "--cross-file-rename",     -- 支持跨文件重命名
+        },
+        filetypes = { "c", "cpp", "objc", "objcpp" },
+        root_dir = lspconfig.util.root_pattern(
+          ".clangd",
+          ".clang-tidy",
+          ".clang-format",
+          "compile_commands.json",
+          "compile_flags.txt",
+          "configure.ac",
+          ".git"
+        ),
+      })
     end,
   },
 }

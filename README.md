@@ -284,16 +284,51 @@ nvim
 
 **使用方法**:
 - 按 `<leader>e` 打开/关闭文件树
-- 在文件树窗口中按 `?` 显示所有快捷键
-- 常用操作:
-  - `a` - 创建文件/目录
-  - `d` - 删除
-  - `r` - 重命名
-  - `x` - 剪切
-  - `c` - 复制
-  - `p` - 粘贴
-  - `R` - 刷新
-  - `q` - 关闭
+- 按 `<leader>E` 在文件树中定位当前文件
+- 在文件树窗口中按 `g?` 显示所有快捷键
+
+**文件操作快捷键**:
+
+| 快捷键 | 功能 | 说明 |
+|--------|------|------|
+| `a` | 创建文件/目录 | 输入名称后按回车，以 `/` 结尾创建目录 |
+| `d` | 删除文件/目录 | 会弹出确认提示 |
+| `D` | 强制删除 | 不提示直接删除 |
+| `r` | 重命名文件 | 修改当前文件/目录名 |
+| `x` | 剪切 | 剪切到剪贴板 |
+| `c` | 复制 | 复制到剪贴板 |
+| `p` | 粘贴 | 粘贴剪贴板内容到当前目录 |
+| `y` | 复制文件名 | 复制文件名到系统剪贴板 |
+| `Y` | 复制相对路径 | 复制相对路径到系统剪贴板 |
+| `gy` | 复制绝对路径 | 复制绝对路径到系统剪贴板 |
+| `R` | 刷新 | 刷新文件树 |
+| `q` | 关闭 | 关闭文件树窗口 |
+
+**导航快捷键**:
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<CR>` 或 `o` | 打开文件/展开折叠目录 |
+| `<C-v>` | 垂直分屏打开 |
+| `<C-x>` | 水平分屏打开 |
+| `<C-t>` | 在新标签页打开 |
+| `P` | 跳转到父目录 |
+| `<C-]>` | 进入目录 |
+| `<BS>` | 返回上级目录 |
+| `K` | 跳转到第一个子项 |
+| `J` | 跳转到最后一个子项 |
+| `I` | 切换隐藏文件显示 |
+| `H` | 切换点文件显示 |
+| `E` | 展开所有目录 |
+| `W` | 折叠所有目录 |
+
+**示例**: 创建新文件
+```
+1. 按 <leader>e 打开文件树
+2. 导航到目标目录，按 a
+3. 输入文件名如 "newfile.lua" 按回车
+4. 或输入 "newfolder/" 创建目录
+```
 
 ### Telescope - 模糊查找器
 
@@ -378,7 +413,7 @@ cs"'     - 双引号改为单引号
 
 ### gitsigns.nvim - Git 集成
 
-**功能**: 显示文件修改标记，支持 blame、diff 预览等。
+**功能**: 显示文件修改标记，支持 blame、diff 预览、hunk 操作等。
 
 **界面符号**:
 - `+` - 新增行
@@ -386,9 +421,128 @@ cs"'     - 双引号改为单引号
 - `_` - 删除行
 - `‾` - 顶部删除行
 
-**使用方法**:
-- 所有操作以 `<leader>h` 或 `<leader>t` 开头
-- 详见快捷键表中的 Git 操作部分
+**快捷键**:
+
+| 快捷键 | 模式 | 功能 |
+|--------|------|------|
+| `<leader>hs` | Normal/Visual | 暂存 hunk (stage) |
+| `<leader>hr` | Normal/Visual | 重置 hunk (reset) |
+| `<leader>hS` | Normal | 暂存整个缓冲区 |
+| `<leader>hu` | Normal | 取消暂存 hunk (unstage) |
+| `<leader>hR` | Normal | 重置整个缓冲区 |
+| `<leader>hp` | Normal | 预览 hunk 修改 |
+| `<leader>hb` | Normal | 显示当前行 blame |
+| `<leader>tb` | Normal | 切换 blame 显示模式 |
+| `<leader>hd` | Normal | 显示 diff |
+| `<leader>hD` | Normal | 显示与上一版本的 diff |
+| `<leader>td` | Normal | 切换已删除行的显示 |
+| `]c` | Normal | 跳转到下一个修改 |
+| `[c` | Normal | 跳转到上一个修改 |
+| `ih` | Operator/Visual | 选择 hunk 文本对象 |
+
+**常用操作示例**:
+
+```
+查看修改:
+1. 打开一个有修改的文件
+2. 左侧会显示修改标记 (+/~/_)
+3. 按 ]c 跳转到下一个修改，[c 跳转到上一个
+
+暂存部分修改:
+1. 将光标移到要暂存的修改块
+2. 按 <leader>hs 暂存当前 hunk
+3. 或进入 visual 模式选择多行后按 <leader>hs
+
+查看 blame:
+1. 按 <leader>hb 查看当前行是谁修改的
+2. 按 <leader>tb 开启/关闭行内 blame 显示
+
+撤销修改:
+1. 将光标移到要撤销的修改
+2. 按 <leader>hr 重置该 hunk 到上次提交状态
+3. 或按 <leader>hR 重置整个文件
+
+预览修改:
+1. 将光标移到修改处
+2. 按 <leader>hp 弹出修改对比窗口
+```
+
+---
+
+### 其他常用 Git 插件推荐
+
+如果你需要更强大的 Git 功能，可以考虑添加以下插件：
+
+#### vim-fugitive - 全面的 Git 命令封装
+
+```lua
+-- 添加到 lazy.nvim 配置
+{ "tpope/vim-fugitive" }
+```
+
+**常用命令**:
+| 命令 | 功能 |
+|------|------|
+| `:G` 或 `:Git` | 查看 Git 状态窗口 |
+| `:Gdiffsplit` | 查看 diff |
+| `:Gwrite` | 相当于 `git add %` |
+| `:Gread` | 撤销当前文件修改 |
+| `:Gcommit` | 提交 |
+| `:Gpush` | 推送 |
+| `:Gpull` | 拉取 |
+| `:Gblame` | 查看 blame |
+| `:Gclog` | 查看当前文件提交历史 |
+
+#### neogit - Magit 风格的 Git 界面
+
+```lua
+-- 添加到 lazy.nvim 配置
+{
+  "NeogitOrg/neogit",
+  dependencies = { "nvim-lua/plenary.nvim" },
+  config = true
+}
+```
+
+**使用**:
+- `:Neogit` - 打开主界面
+- 界面内按 `?` 查看快捷键
+- `s` - stage, `u` - unstage, `c` - commit, `p` - push, `P` - pull
+
+#### diffview.nvim - 查看 diff 和文件历史
+
+```lua
+-- 添加到 lazy.nvim 配置
+{
+  "sindrets/diffview.nvim",
+  dependencies = { "nvim-lua/plenary.nvim" }
+}
+```
+
+**常用命令**:
+| 命令 | 功能 |
+|------|------|
+| `:DiffviewOpen` | 打开 diff 视图 |
+| `:DiffviewClose` | 关闭 diff 视图 |
+| `:DiffviewFileHistory` | 查看文件历史 |
+| `:DiffviewFileHistory %` | 查看当前文件历史 |
+
+#### lazygit.nvim - 集成 lazygit 终端
+
+```lua
+-- 需要先安装 lazygit: https://github.com/jesseduffield/lazygit
+{
+  "kdheepak/lazygit.nvim",
+  dependencies = { "nvim-lua/plenary.nvim" },
+  config = function()
+    vim.keymap.set("n", "<leader>gg", ":LazyGit<CR>", { desc = "Open LazyGit" })
+  end
+}
+```
+
+**使用**:
+- `:LazyGit` - 打开 lazygit 界面
+- `:LazyGitCurrentFile` - 查看当前文件历史
 
 ### nvim-cmp - 自动补全
 
