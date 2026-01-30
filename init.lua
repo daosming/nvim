@@ -142,7 +142,7 @@ require("lazy").setup({
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     config = function()
-      require("nvim-treesitter.configs").setup({
+      require("nvim-treesitter").setup({
         ensure_installed = { 
           "lua", "python", "javascript", "typescript", 
           "c", "cpp", "go", "rust", "bash", "json", 
@@ -267,18 +267,18 @@ require("lazy").setup({
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "pyright", "tsserver" },
+        ensure_installed = { "lua_ls", "pyright", "ts_ls" },
       })
       
-      local lspconfig = require("lspconfig")
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
       
-      -- 配置各 LSP 服务器
-      local servers = { "lua_ls", "pyright", "tsserver", "gopls", "rust_analyzer" }
+      -- 使用新的 vim.lsp.config API 配置各 LSP 服务器
+      local servers = { "lua_ls", "pyright", "ts_ls", "gopls", "rust_analyzer" }
       for _, server in ipairs(servers) do
-        lspconfig[server].setup({
+        vim.lsp.config(server, {
           capabilities = capabilities,
         })
+        vim.lsp.enable(server)
       end
       
       -- LSP 快捷键
