@@ -51,7 +51,7 @@
 | `gcc` | 注释/取消注释 |
 | `s` | 快速跳转 |
 | `<Ctrl+\>` | 打开终端 |
-| `<Space>vs` | 选择 Python 虚拟环境 |
+| `<Space>pe` | 选择 Python 虚拟环境 |
 
 ### 文件管理 (Telescope)
 
@@ -266,8 +266,8 @@ nvim
 
 | 快捷键 | 模式 | 描述 |
 |--------|------|------|
-| `<leader>vs` | Normal | 选择 Python 虚拟环境 |
-| `<leader>vc` | Normal | 选择缓存的虚拟环境 |
+| `<leader>pe` | Normal | 选择 Python 虚拟环境 |
+| `<leader>pc` | Normal | 选择缓存的虚拟环境 |
 | `<leader>f` | Normal | 格式化代码（使用 ruff） |
 | `<leader>cf` | Normal/Visual | 手动格式化选中区域 |
 | `<leader>cl` | Normal | 手动运行代码检查 (ruff) |
@@ -603,8 +603,8 @@ cs"'     - 双引号改为单引号
 
 | 快捷键 | 模式 | 功能 |
 |--------|------|------|
-| `<leader>vs` | Normal | 选择 Python 虚拟环境 |
-| `<leader>vc` | Normal | 选择缓存的虚拟环境 |
+| `<leader>pe` | Normal | 选择 Python 虚拟环境 |
+| `<leader>pc` | Normal | 选择缓存的虚拟环境 |
 | `<leader>f` | Normal | 格式化整个文件 |
 | `<leader>cf` | Normal/Visual | 格式化选中区域 |
 | `<leader>cl` | Normal | 手动运行代码检查 |
@@ -638,7 +638,7 @@ cs"'     - 双引号改为单引号
 ```
 1. 在项目中创建虚拟环境（如: uv venv .venv 或 poetry init）
 2. 在 Neovim 中打开 Python 文件
-3. 按 <leader>vs 打开虚拟环境选择器
+3. 按 <leader>pe 打开虚拟环境选择器
 4. 使用 Telescope 搜索并选择要激活的环境
 5. LSP 、格式化器、lint 将自动使用新环境
 ```
