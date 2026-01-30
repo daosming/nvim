@@ -146,7 +146,8 @@ require("lazy").setup({
         ensure_installed = { 
           "lua", "python", "javascript", "typescript", 
           "c", "cpp", "go", "rust", "bash", "json", 
-          "yaml", "toml", "markdown", "html", "css", "vim", "vimdoc"
+          "yaml", "toml", "markdown", "html", "css", "vim", "vimdoc",
+          "java"
         },
         highlight = { enable = true },
         indent = { enable = true },
@@ -269,6 +270,7 @@ require("lazy").setup({
           typescript = { "prettier" },
           json = { "prettier" },
           yaml = { "prettier" },
+          java = { "google-java-format" },
         },
         format_on_save = {
           timeout_ms = 500,
@@ -312,7 +314,10 @@ require("lazy").setup({
         },
       })
     end,
-
+    keys = {
+      { "<leader>ve", "<cmd>VenvSelect<cr>", desc = "Select Python venv" },
+      { "<leader>vc", "<cmd>VenvSelectCached<cr>", desc = "Select cached venv" },
+    },
   },
 
   -- ============================================
@@ -341,6 +346,54 @@ require("lazy").setup({
   },
 
   -- ============================================
+  -- Java 开发环境 (nvim-java)
+  -- ============================================
+  {
+    "nvim-java/nvim-java",
+    dependencies = {
+      "nvim-java/lua-async-await",
+      "nvim-java/nvim-java-refactor",
+      "nvim-java/nvim-java-core",
+      "nvim-java/nvim-java-test",
+      "nvim-java/nvim-java-dap",
+      "MunifTanjim/nui.nvim",
+      "neovim/nvim-lspconfig",
+      "mfussenegger/nvim-dap",
+      "williamboman/mason.nvim",
+    },
+    config = function()
+      require("java").setup({
+        -- JDK 配置
+        jdk = {
+          -- 自动检测 JAVA_HOME
+          auto_install = false,
+        },
+        -- 根目录检测
+        root_markers = {
+          "pom.xml",
+          "build.gradle",
+          "build.gradle.kts",
+          ".git",
+        },
+        -- LSP 配置
+        java_test = {
+          enable = true,
+        },
+        java_debug_adapter = {
+          enable = true,
+        },
+        spring_boot_tools = {
+          enable = true,
+        },
+        -- 通知设置
+        notifications = {
+          dap = true,
+        },
+      })
+    end,
+  },
+
+  -- ============================================
   -- LSP 支持
   -- ============================================
   
@@ -354,8 +407,17 @@ require("lazy").setup({
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "pyright", "ts_ls" },
+        ensure_installed = { "lua_ls", "pyright", "ts_ls", "jdtls" },
       })
+      
+      -- 确保安装 Java 格式化工具
+      local registry = require("mason-registry")
+      registry.refresh(function()
+        local pkg = registry.get_package("google-java-format")
+        if not pkg:is_installed() then
+          pkg:install()
+        end
+      end)
       
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
       
@@ -376,6 +438,41 @@ require("lazy").setup({
       })
       vim.lsp.enable("pyright")
       
+      -- 配置 Java LSP (jdtls) - 配合 nvim-java 使用
+      vim.lsp.config("jdtls", {
+        capabilities = capabilities,
+        settings = {
+          java = {
+            configuration = {
+              updateBuildConfiguration = "interactive",
+            },
+            format = {
+              enabled = true,
+            },
+            saveActions = {
+              organizeImports = true,
+            },
+            contentProvider = {
+              preferred = "fernflower",
+            },
+            completion = {
+              favoriteStaticMembers = {
+                "org.junit.Assert.*",
+                "org.junit.Assume.*",
+                "org.junit.jupiter.api.Assertions.*",
+                "org.junit.jupiter.api.Assumptions.*",
+                "org.junit.jupiter.api.DynamicContainer.*",
+                "org.junit.jupiter.api.DynamicTest.*",
+                "org.mockito.Mockito.*",
+                "org.mockito.ArgumentMatchers.*",
+                "org.mockito.Answers.*",
+              },
+            },
+          },
+        },
+      })
+      vim.lsp.enable("jdtls")
+      
       -- 其他 LSP 服务器
       local other_servers = { "lua_ls", "ts_ls", "gopls", "rust_analyzer" }
       for _, server in ipairs(other_servers) do
@@ -394,6 +491,13 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
       vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
       vim.keymap.set("n", "<leader>f", function() require("conform").format({ async = true }) end, { desc = "Format code" })
+      
+      -- Java 专属快捷键
+      vim.keymap.set("n", "<leader>jo", function() require("java").open_class_fully_qualified_name() end, { desc = "Java open class by FQN" })
+      vim.keymap.set("n", "<leader>jc", function() require("java").clean_workspace() end, { desc = "Java clean workspace" })
+      vim.keymap.set("n", "<leader>jt", function() require("java").test.run_current_class() end, { desc = "Java test current class" })
+      vim.keymap.set("n", "<leader>jm", function() require("java").test.run_current_method() end, { desc = "Java test current method" })
+      vim.keymap.set("n", "<leader>jv", function() require("java").test.view_last_report() end, { desc = "Java view test report" })
     end,
   },
 
@@ -462,6 +566,7 @@ require("lazy").setup({
         { "<leader>h", group = "Git Hunk" },
         { "<leader>t", group = "Toggle" },
         { "<leader>c", group = "Code" },
+        { "<leader>j", group = "Java" },
 
         { "<leader>e", desc = "File tree" },
         { "<leader>rn", desc = "Rename" },

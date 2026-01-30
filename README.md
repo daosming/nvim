@@ -13,6 +13,8 @@
   - [编辑增强](#编辑增强)
   - [自动补全](#自动补全)
   - [LSP 支持](#lsp-支持)
+  - [Python 开发](#python-开发-1)
+  - [Java 开发](#java-开发-1)
   - [Git 集成](#git-集成)
   - [工具辅助](#工具辅助)
 - [快捷键](#快捷键)
@@ -22,6 +24,7 @@
   - [搜索查找](#搜索查找)
   - [LSP 相关](#lsp-相关)
   - [Python 开发](#python-开发)
+  - [Java 开发](#java-开发)
   - [Git 操作](#git-操作)
 - [插件使用说明](#插件使用说明)
 
@@ -173,6 +176,18 @@ nvim
 | **venv-selector.nvim** | Python 虚拟环境选择器，支持 venv/poetry/conda 等 | linux-cultist/venv-selector.nvim |
 | **pyright** (LSP) | Python 语言服务器，提供补全和类型检查 | microsoft/pyright |
 
+### Java 开发
+
+| 插件 | 描述 | 仓库 |
+|------|------|------|
+| **nvim-java** | 完整的 Java 开发环境，包含 LSP、DAP、测试等 | nvim-java/nvim-java |
+| **nvim-java-core** | Java 核心功能库 | nvim-java/nvim-java-core |
+| **nvim-java-test** | Java 测试运行支持 (JUnit) | nvim-java/nvim-java-test |
+| **nvim-java-dap** | Java 调试适配器 | nvim-java/nvim-java-dap |
+| **nvim-java-refactor** | Java 重构工具 | nvim-java/nvim-java-refactor |
+| **jdtls** (LSP) | Eclipse Java 语言服务器 | eclipse/eclipse.jdt.ls |
+| **google-java-format** | Java 代码格式化工具 | google/google-java-format |
+
 ### Git 集成
 
 | 插件 | 描述 | 仓库 |
@@ -269,6 +284,23 @@ nvim
 | `<leader>f` | Normal | 格式化代码（使用 ruff） |
 | `<leader>cf` | Normal/Visual | 手动格式化选中区域 |
 | `<leader>cl` | Normal | 手动运行代码检查 (ruff) |
+
+### Java 开发
+
+| 快捷键 | 模式 | 描述 |
+|--------|------|------|
+| `<leader>f` | Normal | 格式化代码（使用 google-java-format） |
+| `<leader>jo` | Normal | Java 按全限定名打开类 |
+| `<leader>jc` | Normal | Java 清理工作区 |
+| `<leader>jt` | Normal | Java 运行当前类测试 |
+| `<leader>jm` | Normal | Java 运行当前方法测试 |
+| `<leader>jv` | Normal | Java 查看测试报告 |
+| `gd` | Normal | 跳转到定义 |
+| `gr` | Normal | 查找引用 |
+| `gi` | Normal | 跳转到实现 |
+| `K` | Normal | 显示悬停文档 |
+| `<leader>rn` | Normal | 重命名符号 |
+| `<leader>ca` | Normal | 代码操作（快速修复等） |
 
 ### Git 操作 (Gitsigns)
 
@@ -658,6 +690,98 @@ require("venv-selector").setup({
 - 如果格式化不工作，确保 ruff 已安装: `pip install ruff`
 - 检查 ruff 路径: `:checkhealth conform`
 - 虚拟环境切换后 LSP 需要重新加载缓冲区才能生效：`:e`
+
+---
+
+### Java 开发配置
+
+本配置为 Java 开发提供了完整的支持，基于 `nvim-java` 插件套件：
+
+**功能**:
+- **代码补全**: 基于 jdtls 的智能补全和类型检查
+- **代码格式化**: 使用 google-java-format 自动格式化，保存时自动触发
+- **代码导航**: 跳转到定义、查找引用、跳转到实现等
+- **重构支持**: 重命名、提取方法、内联变量等重构操作
+- **测试运行**: 支持 JUnit 测试运行和调试
+- **调试支持**: 集成 DAP，支持断点调试
+- **Spring Boot**: 支持 Spring Boot 项目开发
+
+**依赖要求**:
+- Java 17+ (已配置好 JAVA_HOME)
+- Maven 或 Gradle 项目
+
+**快捷键**:
+
+| 快捷键 | 模式 | 功能 |
+|--------|------|------|
+| `<leader>f` | Normal | 格式化整个文件 |
+| `<leader>jo` | Normal | 按全限定名打开类 |
+| `<leader>jc` | Normal | 清理工作区 |
+| `<leader>jt` | Normal | 运行当前类测试 |
+| `<leader>jm` | Normal | 运行当前方法测试 |
+| `<leader>jv` | Normal | 查看测试报告 |
+| `gd` | Normal | 跳转到定义 |
+| `gD` | Normal | 跳转到声明 |
+| `gr` | Normal | 查找引用 |
+| `gi` | Normal | 跳转到实现 |
+| `K` | Normal | 显示悬停文档 |
+| `<leader>rn` | Normal | 重命名符号 |
+| `<leader>ca` | Normal | 代码操作（快速修复等） |
+
+**使用方法**:
+
+1. **打开项目**:
+   ```bash
+   cd /path/to/your/maven-or-gradle-project
+   nvim .
+   ```
+
+2. **首次启动**:
+   - 打开 Java 文件时会自动下载 jdtls 和相关工具
+   - 首次打开项目需要等待依赖下载完成
+   - 右下角会显示加载进度
+
+3. **运行测试**:
+   - 将光标放在测试类中，按 `<leader>jt` 运行整个类的测试
+   - 将光标放在测试方法中，按 `<leader>jm` 运行单个测试方法
+   - 按 `<leader>jv` 查看测试报告
+
+4. **清理工作区**:
+   - 如果遇到奇怪的问题，按 `<leader>jc` 清理工作区
+   - 这会清除 jdtls 的索引和缓存
+
+**项目结构要求**:
+
+nvim-java 会自动检测以下项目根目录标记：
+- `pom.xml` (Maven 项目)
+- `build.gradle` / `build.gradle.kts` (Gradle 项目)
+- `.git` (Git 仓库)
+
+**Spring Boot 支持**:
+
+如果项目包含 Spring Boot，nvim-java 会自动启用 Spring Boot Tools 支持：
+- 自动配置提示
+- 属性文件补全
+- 代码导航增强
+
+**常见问题**:
+
+1. **LSP 无法启动**:
+   - 检查 JAVA_HOME 是否正确设置: `echo $JAVA_HOME`
+   - 确保 Java 版本是 17+: `java -version`
+   - 检查项目是否有 pom.xml 或 build.gradle
+
+2. **格式化不工作**:
+   - 在 Mason 中安装 google-java-format: `:Mason` → 找到 google-java-format → `i` 安装
+   - 检查配置: `:checkhealth conform`
+
+3. **测试运行失败**:
+   - 确保项目中包含 JUnit 依赖
+   - 检查 Maven/Gradle 是否能正常编译: `mvn compile` 或 `./gradlew compileJava`
+
+4. **内存不足**:
+   - jdtls 默认使用较多内存，可以在配置中调整 JVM 参数
+   - 编辑 init.lua 中的 nvim-java 配置，添加 jdtls 内存设置
 
 ---
 
