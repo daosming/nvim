@@ -21,6 +21,7 @@
   - [缓冲区操作](#缓冲区操作)
   - [搜索查找](#搜索查找)
   - [LSP 相关](#lsp-相关)
+  - [Python 开发](#python-开发)
   - [Git 操作](#git-操作)
 - [插件使用说明](#插件使用说明)
 
@@ -46,6 +47,7 @@
 | `K` | 查看文档 |
 | `<Space>rn` | 重命名 |
 | `<Space>ca` | 代码操作 |
+| `<Space>f` | 格式化代码 |
 | `gcc` | 注释/取消注释 |
 | `s` | 快速跳转 |
 | `<Ctrl+\>` | 打开终端 |
@@ -162,6 +164,14 @@ nvim
 | **mason.nvim** | LSP/DAP/格式化工具安装管理器 | williamboman/mason.nvim |
 | **mason-lspconfig.nvim** | Mason 与 lspconfig 的桥梁 | williamboman/mason-lspconfig.nvim |
 
+### Python 开发
+
+| 插件 | 描述 | 仓库 |
+|------|------|------|
+| **conform.nvim** | 代码格式化工具，支持 ruff | stevearc/conform.nvim |
+| **nvim-lint** | 代码检查工具，支持 ruff | mfussenegger/nvim-lint |
+| **pyright** (LSP) | Python 语言服务器，提供补全和类型检查 | microsoft/pyright |
+
 ### Git 集成
 
 | 插件 | 描述 | 仓库 |
@@ -249,6 +259,14 @@ nvim
 | `<leader>rn` | Normal | 重命名符号 |
 | `<leader>ca` | Normal | 代码操作（快速修复等） |
 | `<leader>f` | Normal | 格式化代码 |
+
+### Python 开发
+
+| 快捷键 | 模式 | 描述 |
+|--------|------|------|
+| `<leader>f` | Normal | 格式化代码（使用 ruff） |
+| `<leader>cf` | Normal/Visual | 手动格式化选中区域 |
+| `<leader>cl` | Normal | 手动运行代码检查 (ruff) |
 
 ### Git 操作 (Gitsigns)
 
@@ -566,6 +584,34 @@ cs"'     - 双引号改为单引号
 - `u` - 更新
 - `X` - 卸载
 - `g?` - 显示帮助
+
+### Python 开发配置
+
+本配置为 Python 开发提供了完整的支持：
+
+**功能**: 
+- **代码补全**: 基于 pyright 的智能补全和类型检查
+- **代码格式化**: 使用 ruff 自动格式化，保存时自动触发
+- **代码检查**: 使用 ruff 检测代码问题（未使用导入、语法错误等）
+
+**快捷键**:
+
+| 快捷键 | 模式 | 功能 |
+|--------|------|------|
+| `<leader>f` | Normal | 格式化整个文件 |
+| `<leader>cf` | Normal/Visual | 格式化选中区域 |
+| `<leader>cl` | Normal | 手动运行代码检查 |
+
+**使用方法**:
+- 打开 Python 文件时自动启用
+- 保存文件时自动格式化代码
+- 代码问题会显示在左侧标记栏和诊断列表中
+
+**常见问题**:
+- 如果格式化不工作，确保 ruff 已安装: `pip install ruff`
+- 检查 ruff 路径: `:checkhealth conform`
+
+---
 
 ### nvim-lspconfig - LSP 配置
 

@@ -254,6 +254,61 @@ require("lazy").setup({
   },
 
   -- ============================================
+  -- 代码格式化
+  -- ============================================
+  {
+    "stevearc/conform.nvim",
+    event = { "BufWritePre" },
+    cmd = { "ConformInfo" },
+    config = function()
+      require("conform").setup({
+        formatters_by_ft = {
+          python = { "ruff_format", "ruff_organize_imports" },
+          lua = { "stylua" },
+          javascript = { "prettier" },
+          typescript = { "prettier" },
+          json = { "prettier" },
+          yaml = { "prettier" },
+        },
+        format_on_save = {
+          timeout_ms = 500,
+          lsp_fallback = true,
+        },
+      })
+      
+      -- 手动格式化快捷键
+      vim.keymap.set({ "n", "v" }, "<leader>cf", function()
+        require("conform").format({ async = true })
+      end, { desc = "Format code" })
+    end,
+  },
+
+  -- ============================================
+  -- 代码检查 (Linting)
+  -- ============================================
+  {
+    "mfussenegger/nvim-lint",
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      local lint = require("lint")
+      lint.linters_by_ft = {
+        python = { "ruff" },
+      }
+      
+      -- 自动触发 lint
+      vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
+        callback = function()
+          lint.try_lint()
+        end,
+      })
+      
+      vim.keymap.set("n", "<leader>cl", function()
+        lint.try_lint()
+      end, { desc = "Run linter" })
+    end,
+  },
+
+  -- ============================================
   -- LSP 支持
   -- ============================================
   
@@ -272,9 +327,26 @@ require("lazy").setup({
       
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
       
-      -- 使用新的 vim.lsp.config API 配置各 LSP 服务器
-      local servers = { "lua_ls", "pyright", "ts_ls", "gopls", "rust_analyzer" }
-      for _, server in ipairs(servers) do
+      -- 配置 Python LSP (pyright)
+      -- 配置 Python LSP (pyright)
+      vim.lsp.config("pyright", {
+        capabilities = capabilities,
+        settings = {
+          python = {
+            analysis = {
+              typeCheckingMode = "basic",
+              autoSearchPaths = true,
+              useLibraryCodeForTypes = true,
+              diagnosticMode = "workspace",
+            },
+          },
+        },
+      })
+      vim.lsp.enable("pyright")
+      
+      -- 其他 LSP 服务器
+      local other_servers = { "lua_ls", "ts_ls", "gopls", "rust_analyzer" }
+      for _, server in ipairs(other_servers) do
         vim.lsp.config(server, {
           capabilities = capabilities,
         })
@@ -289,7 +361,7 @@ require("lazy").setup({
       vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover documentation" })
       vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
       vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
-      vim.keymap.set("n", "<leader>f", function() vim.lsp.buf.format({ async = true }) end, { desc = "Format code" })
+      vim.keymap.set("n", "<leader>f", function() require("conform").format({ async = true }) end, { desc = "Format code" })
     end,
   },
 
