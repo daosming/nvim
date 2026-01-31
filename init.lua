@@ -351,7 +351,7 @@ require("lazy").setup({
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     config = function()
-      require("nvim-treesitter.configs").setup({
+      require("nvim-treesitter").setup({
         ensure_installed = { 
           "lua", "python", "javascript", "typescript", "tsx",
           "c", "cpp", "go", "rust", "bash", "json", 
@@ -539,6 +539,8 @@ require("lazy").setup({
           markdown = { "prettier" },
           graphql = { "prettier" },
           java = { "google-java-format" },
+          -- Rust 格式化
+          rust = { "rustfmt" },
         },
         format_on_save = {
           timeout_ms = 500,
@@ -563,7 +565,6 @@ require("lazy").setup({
       "nvim-telescope/telescope.nvim",
       "mfussenegger/nvim-dap-python",
     },
-    branch = "regexp",
     event = "VeryLazy",
     config = function()
       require("venv-selector").setup({
@@ -688,6 +689,8 @@ require("lazy").setup({
           "html", "cssls", "tailwindcss", "eslint",
           "jsonls", "yamlls", "vuels", "svelte",
           "prismals", "graphql",
+          -- Rust LSP
+          "rust_analyzer",
         },
       })
       
@@ -703,6 +706,15 @@ require("lazy").setup({
       -- 确保安装前端格式化工具和 linter
       local frontend_tools = { "prettier", "eslint_d" }
       for _, tool in ipairs(frontend_tools) do
+        local ok, pkg = pcall(registry.get_package, tool)
+        if ok and not pkg:is_installed() then
+          pkg:install()
+        end
+      end
+      
+      -- 确保安装 Rust 工具链
+      local rust_tools = { "codelldb" }  -- Rust 调试器
+      for _, tool in ipairs(rust_tools) do
         local ok, pkg = pcall(registry.get_package, tool)
         if ok and not pkg:is_installed() then
           pkg:install()
@@ -919,8 +931,77 @@ require("lazy").setup({
       })
       vim.lsp.enable("graphql")
       
+      -- Rust LSP (rust-analyzer) 详细配置
+      vim.lsp.config("rust_analyzer", {
+        capabilities = capabilities,
+        settings = {
+          ["rust-analyzer"] = {
+            cargo = {
+              allFeatures = true,
+              loadOutDirsFromCheck = true,
+              runBuildScripts = true,
+            },
+            checkOnSave = {
+              allFeatures = true,
+              command = "clippy",
+              extraArgs = { "--no-deps" },
+            },
+            procMacro = {
+              enable = true,
+              ignored = {
+                ["async-trait"] = { "async_trait" },
+                ["napi-derive"] = { "napi" },
+                ["async-recursion"] = { "async_recursion" },
+              },
+            },
+            inlayHints = {
+              bindingModeHints = {
+                enable = false,
+              },
+              chainingHints = {
+                enable = true,
+              },
+              closingBraceHints = {
+                enable = true,
+                minLines = 25,
+              },
+              closureReturnTypeHints = {
+                enable = "never",
+              },
+              lifetimeElisionHints = {
+                enable = "never",
+                useParameterNames = false,
+              },
+              maxLength = 25,
+              parameterHints = {
+                enable = true,
+              },
+              reborrowHints = {
+                enable = "never",
+              },
+              renderColons = true,
+              typeHints = {
+                enable = true,
+                hideClosureInitialization = false,
+                hideNamedConstructor = false,
+              },
+            },
+            rustfmt = {
+              overrideCommand = nil,
+              extraArgs = {},
+            },
+            completion = {
+              autoimport = {
+                enable = true,
+              },
+            },
+          },
+        },
+      })
+      vim.lsp.enable("rust_analyzer")
+      
       -- 其他 LSP 服务器
-      local other_servers = { "lua_ls", "gopls", "rust_analyzer" }
+      local other_servers = { "lua_ls", "gopls" }
       for _, server in ipairs(other_servers) do
         vim.lsp.config(server, {
           capabilities = capabilities,
@@ -956,6 +1037,12 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>jt", function() require("java").test.run_current_class() end, { desc = "Java test current class" })
       vim.keymap.set("n", "<leader>jm", function() require("java").test.run_current_method() end, { desc = "Java test current method" })
       vim.keymap.set("n", "<leader>jv", function() require("java").test.view_last_report() end, { desc = "Java view test report" })
+      
+      -- Rust 专属快捷键
+      vim.keymap.set("n", "<leader>cr", "<cmd>!cargo run<cr>", { desc = "Cargo run" })
+      vim.keymap.set("n", "<leader>cb", "<cmd>!cargo build<cr>", { desc = "Cargo build" })
+      vim.keymap.set("n", "<leader>cc", "<cmd>!cargo check<cr>", { desc = "Cargo check" })
+      vim.keymap.set("n", "<leader>ct", "<cmd>!cargo test<cr>", { desc = "Cargo test" })
     end,
   },
 
@@ -2128,22 +2215,12 @@ require("lazy").setup({
       "nvim-lua/plenary.nvim",
     },
     config = function()
-      require("lazygit").setup({
-        cmd = {
-          "lazygit",
-          "-ucf",
-          vim.fn.stdpath("cache") .. "/lazygit/config.yml",
-        },
-        config_file_path = vim.fn.stdpath("cache") .. "/lazygit/config.yml",
-        branch = "main",
-        floating_window_winblend = 0,
-        floating_window_scaling_factor = 0.9,
-        floating_window_border_chars = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
-        floating_window_use_plenary = false,
-        use_neovim_remote = true,
-        use_custom_config_file_path = false,
-        config_file_path = "",
-      })
+      -- Configure lazygit via global variables
+      vim.g.lazygit_floating_window_winblend = 0
+      vim.g.lazygit_floating_window_scaling_factor = 0.9
+      vim.g.lazygit_floating_window_border_chars = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
+      vim.g.lazygit_floating_window_use_plenary = 0
+      vim.g.lazygit_use_neovim_remote = 1
 
       vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<CR>", { desc = "LazyGit" })
       vim.keymap.set("n", "<leader>gf", "<cmd>LazyGitCurrentFile<CR>", { desc = "LazyGit current file" })
@@ -2473,6 +2550,218 @@ require("lazy").setup({
           glob = { "*.json" },
         },
       })
+    end,
+  },
+
+  -- ============================================
+  -- 更多实用插件 (2024 推荐)
+  -- ============================================
+
+  -- 🗺️ 代码大纲/符号导航 - 类似 VSCode 的 Outline
+  {
+    "hedyhli/outline.nvim",
+    lazy = true,
+    cmd = { "Outline", "OutlineOpen" },
+    keys = {
+      { "<leader>o", "<cmd>Outline<CR>", desc = "Toggle outline" },
+    },
+    config = function()
+      require("outline").setup({
+        outline_window = {
+          position = "right",
+          width = 25,
+          auto_close = false,
+          focus_on_open = true,
+        },
+        guides = {
+          enabled = true,
+          markers = {
+            bottom = "└",
+            middle = "├",
+            vertical = "│",
+          },
+        },
+        symbol_folding = {
+          autofold_depth = 1,
+          auto_unfold = { hovered = true },
+        },
+        keymaps = {
+          close = { "<Esc>", "q" },
+          goto_location = "<Cr>",
+          peek_location = "p",
+          fold = "h",
+          unfold = "l",
+          fold_toggle = "<Tab>",
+          fold_all = "W",
+          unfold_all = "E",
+        },
+      })
+    end,
+  },
+
+  -- 🎯 多光标编辑 - 类似 VSCode 的 Ctrl+D
+  {
+    "mg979/vim-visual-multi",
+    branch = "master",
+    lazy = false,
+    init = function()
+      vim.g.VM_default_mappings = 0
+      vim.g.VM_maps = {
+        ["Find Under"] = "<C-d>",
+        ["Find Subword Under"] = "<C-d>",
+        ["Select All"] = "\\sa",
+        ["Add Cursor Down"] = "<C-Down>",
+        ["Add Cursor Up"] = "<C-Up>",
+      }
+      vim.g.VM_theme = "ocean"
+    end,
+  },
+
+  -- 🔍 缩进检测 - 自动检测缩进风格
+  {
+    "tpope/vim-sleuth",
+    event = { "BufReadPre", "BufNewFile" },
+  },
+
+  -- 📐 对齐工具 - 快速对齐代码
+  {
+    "junegunn/vim-easy-align",
+    keys = {
+      { "ga", "<Plug>(EasyAlign)", desc = "Easy align", mode = { "n", "x" } },
+    },
+  },
+
+  -- 🔀 Git 冲突解决工具
+  {
+    "akinsho/git-conflict.nvim",
+    version = "*",
+    config = function()
+      require("git-conflict").setup({
+        default_mappings = true,
+        default_commands = true,
+        disable_diagnostics = false,
+        list_opener = "copen",
+        highlights = {
+          incoming = "DiffAdd",
+          current = "DiffText",
+        },
+      })
+    end,
+  },
+
+  -- 👁️ Git blame 内嵌显示
+  {
+    "f-person/git-blame.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("gitblame").setup({
+        enabled = false,
+        message_template = "  󰇮 <author> • <date> • <summary>",
+        date_format = "%Y-%m-%d %H:%M",
+        virtual_text_column = 1,
+      })
+      vim.keymap.set("n", "<leader>gB", "<cmd>GitBlameToggle<CR>", { desc = "Toggle git blame" })
+    end,
+  },
+
+  -- 📋 更好的寄存器管理
+  {
+    "tversteeg/registers.nvim",
+    cmd = "Registers",
+    config = function()
+      require("registers").setup({
+        window = { border = "rounded", transparency = 10 },
+      })
+    end,
+    keys = {
+      { "\"", "<cmd>Registers<cr>", desc = "Registers", mode = { "n", "v" } },
+      { "<C-R>", "<cmd>Registers<cr>", desc = "Registers", mode = "i" },
+    },
+  },
+
+  -- 📝 更好的 jk 退出插入模式
+  {
+    "max397574/better-escape.nvim",
+    event = "InsertEnter",
+    config = function()
+      require("better_escape").setup({
+        mappings = {
+          i = { j = { k = "<Esc>", j = "<Esc>" } },
+          c = { j = { k = "<Esc>", j = "<Esc>" } },
+          t = { j = { k = "<C-\\><C-n>" } },
+          v = { j = { k = "<Esc>" } },
+          s = { j = { k = "<Esc>" } },
+        },
+      })
+    end,
+  },
+
+  -- 🔧 自动保存
+  {
+    "okuuva/auto-save.nvim",
+    version = "^1.0.0",
+    cmd = "ASToggle",
+    event = { "InsertLeave", "TextChanged" },
+    keys = {
+      { "<leader>as", "<cmd>ASToggle<CR>", desc = "Toggle auto-save" },
+    },
+    opts = {
+      enabled = false,
+      trigger_events = {
+        immediate_save = { "BufLeave", "FocusLost" },
+        defer_save = { "InsertLeave", "TextChanged" },
+        cancel_deferred_save = { "InsertEnter" },
+      },
+      debounce_delay = 1000,
+    },
+  },
+
+  -- 🎯 大文件优化 - 自动禁用耗资源功能
+  {
+    "LunarVim/bigfile.nvim",
+    event = { "FileReadPre", "BufReadPre", "User FileOpened" },
+    opts = {
+      filesize = 2, -- MB
+      pattern = { "*" },
+      features = {
+        "indent_blankline",
+        "illuminate",
+        "lsp",
+        "treesitter",
+        "syntax",
+        "matchparen",
+        "vimopts",
+        "filetype",
+      },
+    },
+  },
+
+  -- 🌐 翻译工具
+  {
+    "potamides/pantran.nvim",
+    cmd = "Pantran",
+    keys = {
+      { "<leader>tr", "<cmd>Pantran<CR>", desc = "Translate", mode = { "n", "v" } },
+    },
+    config = function()
+      require("pantran").setup({
+        default_engine = "google",
+        engines = {
+          google = {
+            default_source = "auto",
+            default_target = "zh",
+          },
+        },
+      })
+    end,
+  },
+
+  -- 📊 启动时间分析
+  {
+    "dstein64/vim-startuptime",
+    cmd = "StartupTime",
+    config = function()
+      vim.g.startuptime_tries = 10
     end,
   },
 })
